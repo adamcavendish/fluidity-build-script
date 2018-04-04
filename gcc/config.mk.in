@@ -1,0 +1,34 @@
+CONFIGURE_OPTS ?=                              \
+  --with-local-prefix=$(prefix)                \
+  --with-mpfr=$(prefix)                        \
+  --with-gmp=$(prefix)                         \
+  --with-mpc=$(prefix)                         \
+  --with-system-zlib                           \
+  --with-target-system-zlib                    \
+  --enable-checking=release                    \
+  --enable-clocale=gnu                         \
+  --enable-cloog-backend=isl                   \
+  --enable-__cxa_atexit                        \
+  --enable-default-pie                         \
+  --enable-gnu-unique-object                   \
+  --enable-gtk-cairo                           \
+  --enable-languages=c,c++,fortran             \
+  --enable-libmpx                              \
+  --enable-libssp                              \
+  --enable-libstdcxx-debug                     \
+  --enable-libstdcxx-time=yes                  \
+  --enable-linker-build-id                     \
+  --enable-lto                                 \
+  --enable-nls                                 \
+  --enable-plugin                              \
+  --enable-shared                              \
+  --enable-threads=posix                       \
+  --without-included-gettext                   \
+  --with-default-libstdcxx-abi=gcc4-compatible \
+  --with-tune=generic                          \
+  --disable-vtable-verify                      \
+  --disable-multilib
+
+BUILD_OPTS ?=  -Wall -Wextra
+#BUILD_OPTS ?= 
+

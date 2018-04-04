@@ -1,0 +1,17 @@
+#%Module1.0#####################################################################
+##
+## LAPACK modulefile
+##
+proc ModuleHelp { } {
+  global version
+  puts stderr "\tLAPACK {{LAPACK}}"
+}
+
+module-whatis "LAPACK {{LAPACK}}"
+
+set basedir {{BASE_DIR}}
+
+module load gcc-{{GCC}}
+module load blas-{{BLAS}}
+
+prepend-path LD_LIBRARY_PATH ${basedir}/lib/

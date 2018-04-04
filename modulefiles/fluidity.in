@@ -1,0 +1,28 @@
+#%Module1.0#####################################################################
+##
+## Fluidity modulefile
+##
+proc ModuleHelp { } {
+  global version
+  puts stderr "\tFluidity {{FLUIDITY}}"
+}
+
+module-whatis "Fluidity {{FLUIDITY}}"
+
+set basedir {{BASE_DIR}}
+
+module load gcc-{{GCC}}
+module load openmpi-{{OPENMPI}}
+module load blas-{{BLAS}}
+module load lapack-{{LAPACK}}
+module load udunits-{{UDUNITS}}
+module load petsc-{{PETSC}}
+module load gmsh-{{GMSH}}
+module load vtk-{{VTK}}
+
+prepend-path PATH               ${basedir}/bin/
+prepend-path C_INCLUDE_PATH     ${basedir}/include/
+prepend-path CPLUS_INCLUDE_PATH ${basedir}/include/
+prepend-path LD_LIBRARY_PATH    ${basedir}/lib/
+prepend-path MANPATH            ${basedir}/man/
+prepend-path PYTHONPATH         ${basedir}/lib/python{{PYTHON_MAJOR_MINOR}}/site-packages

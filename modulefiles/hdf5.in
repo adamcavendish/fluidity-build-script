@@ -1,0 +1,21 @@
+#%Module1.0#####################################################################
+##
+## HDF5 modulefile
+##
+proc ModuleHelp { } {
+  global version
+  puts stderr "\tHDF5 {{HDF5}}"
+}
+
+module-whatis "HDF5 {{HDF5}}"
+
+set basedir {{BASE_DIR}}
+
+module load gcc-{{GCC}}
+module load openmpi-{{OPENMPI}}
+
+prepend-path PATH               ${basedir}/bin/
+prepend-path C_INCLUDE_PATH     ${basedir}/include/
+prepend-path CPLUS_INCLUDE_PATH ${basedir}/include/
+prepend-path LD_LIBRARY_PATH    ${basedir}/lib/
+prepend-path LD_LIBRARY_PATH    ${basedir}/lib64/

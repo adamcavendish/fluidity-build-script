@@ -1,0 +1,15 @@
+#%Module1.0#####################################################################
+##
+## lzip modulefile
+##
+proc ModuleHelp { } {
+  global version
+  puts stderr "\tLzip {{LZIP}}"
+}
+
+module-whatis "Lzip {{LZIP}}"
+
+set basedir {{BASE_DIR}}
+
+prepend-path PATH               ${basedir}/bin/
+prepend-path MANPATH            ${basedir}/share/man/

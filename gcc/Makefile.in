@@ -1,0 +1,138 @@
+# Copyright © 2013, 2014, 2015, 2016, 2017 Brandon Invergo <brandon@invergo.net>
+# Copyright © 2017, 2018 Carl Hansen <carlhansen@gnu.org>
+#
+# This file is part of GSRC.
+#
+# GSRC is free software: you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# GSRC is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+# License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with GSRC.  If not, see <http://www.gnu.org/licenses/>.
+#
+#
+# Send bug reports and comments about GSRC problems to bug-gsrc@gnu.org
+
+NAME = The GNU Compiler Collection
+GARNAME = gcc
+GARVERSION =  {{GCC}}
+HOME_URL = http://www.gnu.org/software/gcc
+DESCRIPTION = GNU Compiler Collection
+define BLURB
+GCC is the GNU Compiler Collection.  It provides compiler front-ends
+for several languages, including C, C++, Objective-C, Fortran, Java,
+Ada, and Go.  It also includes runtime support libraries for these
+languages.
+endef
+
+######################################################################
+
+MASTER_SITES = $(MASTER_GNU)
+MASTER_SUBDIR = $(GARNAME)/$(DISTNAME)/
+DISTFILES = $(DISTNAME).tar.xz
+SIGFILES =  $(DISTNAME).tar.xz.sig
+
+WORKSRC = $(WORKDIR)/$(DISTNAME)
+WORKOBJ = $(WORKDIR)/$(DISTNAME).build
+# CONFIGURE_SCRIPTS = reallyconfigure
+BUILD_SCRIPTS = reallybuild
+INSTALL_SCRIPTS = $(WORKOBJ)/Makefile links
+INFO_FILES = cpp.info  cppinternals.info  cp-tools.info  \
+gccgo.info  gcc.info  \
+gccinstall.info  gccint.info  gcj.info  gfortran.info  gnat_rm.info  \
+gnat-style.info gnat_ugn.info  libgomp.info  libitm.info  \
+libquadmath.info
+
+BUILDDEPS = gmp mpfr mpc isl zlib
+LIBDEPS =
+#USE_AUTORECONF=y
+
+
+######################################################################
+## Configuration options for gcc ##
+
+## Note: you must set up your environment (PATH, LDPATH, etc) to
+## include GSRC-installed packages in order to install gcc as
+## configured below. You can do this easily like so in Bash:
+## $ source $(your_gsrc_dir) setup.sh
+
+## adjust --enable-languages=   to your liking; this is maximal.
+## gnat (ada) is a special case;  requires a working ada compiler to
+## already be installed, the compiler you are using to compile the rest.
+
+# --enable-languages=c,c++,fortran,go,lto,objc,obj-c++,ada,brig
+
+# --enable-languages=jit
+# jit requires --enable-host-shared
+# --enable-host-shared typically slows the rest of the compiler down by
+# a few %, so you must explicitly enable it.
+
+# If you want to build both the jit and the regular compiler, it is often
+# best to do this via two separate configure/builds, in separate
+# directories, to avoid imposing the performance cost of
+# --enable-host-shared on the regular compiler.
+
+# adjust --build= --host= --target=
+# near end of list, as desired
+
+CONFIGURE_ARGS +=                            \
+--with-local-prefix=$(prefix)                \
+--with-mpfr=$(prefix)                        \
+--with-gmp=$(prefix)                         \
+--with-mpc=$(prefix)                         \
+--with-system-zlib                           \
+--with-target-system-zlib                    \
+--enable-checking=release                    \
+--enable-clocale=gnu                         \
+--enable-cloog-backend=isl                   \
+--enable-__cxa_atexit                        \
+--enable-default-pie                         \
+--enable-gnu-unique-object                   \
+--enable-gtk-cairo                           \
+--enable-languages=c,c++,fortran             \
+--enable-libmpx                              \
+--enable-libssp                              \
+--enable-libstdcxx-debug                     \
+--enable-libstdcxx-time=yes                  \
+--enable-linker-build-id                     \
+--enable-lto                                 \
+--enable-nls                                 \
+--enable-plugin                              \
+--enable-shared                              \
+--enable-threads=posix                       \
+--without-included-gettext                   \
+--with-default-libstdcxx-abi=gcc4-compatible \
+--with-tune=generic                          \
+--disable-vtable-verify                      \
+--disable-multilib                           \
+--program-prefix=x86_64-linux-gnu-           \
+--program-suffix=-{{GCC}}                    \
+--build=x86_64-linux-gnu                     \
+--host=x86_64-linux-gnu                      \
+--target=x86_64-linux-gnu
+
+
+
+CPPFLAGS += -I$(prefix)/include
+
+include ../../../gar/gar.lib/auto.mk
+include ../../../gar/gar.lib/info.mk
+include config.mk
+
+build-reallybuild:
+	@printf "[$(OK)reallybuild$(OFF)] $(MSG)Running reallybuild in $(OFF)$*\n"
+	cd $(WORKOBJ)  &&  $(MAKE) all
+	$(MAKECOOKIE)
+
+install-links:
+	@ln -sf gcc $(packageprefix)/bin/cc
+	@ln -sf ../bin/cpp $(packageprefix)/lib/cpp
+	$(MAKECOOKIE)
+
+
