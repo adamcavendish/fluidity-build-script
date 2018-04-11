@@ -31,6 +31,10 @@ unset CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH INCLUDE
 unset LD_LIBRARY_PATH LIBRARY_PATH
 unset PKG_CONFIG_PATH
 
+export CC='sw5cc -host'
+export CXX='sw5CC -host'
+export FC='sw5f90 -host'
+
 # TCL
 BASE_DIR="$INSTALL_DIR/tcl-$TCL"
 if [ ! -d "$BASE_DIR" ]; then
@@ -73,50 +77,6 @@ if [ ! -d "$BASE_DIR" ]; then
   make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/lzip-$LZIP.build.log"
 fi
 cat "$MOD_IN_DIR/lzip.in" | mo > "$MOD_GL_DIR/lzip-$LZIP"
-
-# GSRC: GNU Source Release Collection
-#     for gcc, gmp, mpfr, mpc, etc.
-BASE_DIR="$INSTALL_DIR/gnu/"
-if [ ! -d "$BASE_DIR" ]; then
-  echo "------------------------------Build gsrc-$GCC------------------------------"
-  module load "lzip-$LZIP"
-
-  # Before building GCC. ENV must be ensured clean.
-  unset CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH INCLUDE
-  unset LD_LIBRARY_PATH LIBRARY_PATH
-  unset PKG_CONFIG_PATH
-
-  cd "$SOURCE_DIR/gsrc"
-  ./bootstrap                                                                  2>&1 | tee "$LOG_DIR/gsrc-$GCC.bootstrap.log"
-  ./configure --prefix="$BASE_DIR"                                             2>&1 | tee "$LOG_DIR/gsrc-$GCC.conf.log"
-  . ./setup.sh
-
-  make -C pkg/other/zlib uninstall-pkg                                         2>&1 | tee "$LOG_DIR/gsrc-$GCC-zlib.uinst.log"
-  make -C pkg/other/zlib install -j$(nproc)                                    2>&1 | tee "$LOG_DIR/gsrc-$GCC-zlib.build.log"
-
-  make -C pkg/gnu/gmp    uninstall-pkg                                         2>&1 | tee "$LOG_DIR/gsrc-$GCC-gmp.uinst.log"
-  make -C pkg/gnu/gmp    install -j$(nproc)                                    2>&1 | tee "$LOG_DIR/gsrc-$GCC-gmp.build.log"
-
-  make -C pkg/gnu/mpfr   uninstall-pkg                                         2>&1 | tee "$LOG_DIR/gsrc-$GCC-mpfr.uinst.log"
-  make -C pkg/gnu/mpfr   install -j$(nproc)                                    2>&1 | tee "$LOG_DIR/gsrc-$GCC-mpfr.build.log"
-
-  make -C pkg/gnu/mpc    uninstall-pkg                                         2>&1 | tee "$LOG_DIR/gsrc-$GCC-mpc.uinst.log"
-  make -C pkg/gnu/mpc    install -j$(nproc)                                    2>&1 | tee "$LOG_DIR/gsrc-$GCC-mpc.build.log"
-
-  make -C pkg/other/isl  uninstall-pkg                                         2>&1 | tee "$LOG_DIR/gsrc-$GCC-isl.uinst.log"
-  make -C pkg/other/isl  install -j$(nproc)                                    2>&1 | tee "$LOG_DIR/gsrc-$GCC-isl.build.log"
-
-  cat "$SCRIPT_DIR/gcc/Makefile.in" | mo > "$SOURCE_DIR/gsrc/pkg/gnu/gcc/Makefile"
-  cat "$SCRIPT_DIR/gcc/config.mk.in" | mo > "$SOURCE_DIR/gsrc/pkg/gnu/gcc/config.mk"
-  make -C pkg/gnu/gcc    uninstall-pkg                                         2>&1 | tee "$LOG_DIR/gsrc-$GCC-gcc.uinst.log"
-  make -C pkg/gnu/gcc    install -j$(nproc)                                    2>&1 | tee "$LOG_DIR/gsrc-$GCC-gcc.build.log"
-
-  make -C pkg/gnu/binutils uninstall-pkg                                       2>&1 | tee "$LOG_DIR/gsrc-$GCC-binutils.uinst.log"
-  make -C pkg/gnu/binutils install -j$(nproc)                                  2>&1 | tee "$LOG_DIR/gsrc-$GCC-binutils.build.log"
-
-  module unload "lzip-$LZIP"
-fi
-cat "$MOD_IN_DIR/gcc.in" | mo > "$MOD_GL_DIR/gcc-$GCC"
 
 # OpenMPI
 BASE_DIR="$INSTALL_DIR/openmpi-$OPENMPI/"
