@@ -9,15 +9,21 @@ mkdir -p "$INSTALL_DIR/cc_hack/"
 for COMPILER in CC CXX FC; do
   for MODE in host slave hybrid; do
 
-cat > "$INSTALL_DIR/cc_hack/$COMPILER"_"$MODE" <<EOHD
-  ${!COMPILER} -$MODE "\$@"
+    _FILE="$INSTALL_DIR/cc_hack/$COMPILER"_"$MODE"
+    cat > "$_FILE" <<EOHD
+${!COMPILER} -$MODE "\$@"
 EOHD
+    chmod +x "$_FILE"
+    unset _FILE
 
   done
 done
 
-export CC="$INSTALL_DIR/cc_hack/CC_HOST"
-export CXX="$INSTALL_DIR/cc_hack/CXX_HOST"
-export FC="$INSTALL_DIR/cc_hack/FC_HOST"
+# export CC="$INSTALL_DIR/cc_hack/CC_host"
+# export CXX="$INSTALL_DIR/cc_hack/CXX_host"
+# export FC="$INSTALL_DIR/cc_hack/FC_host"
+export CC='/usr/sw-mpp/bin/mpicc'
+export CXX='/usr/sw-mpp/bin/mpiCC'
+export FC='/usr/sw-mpp/bin/mpif90'
 export AR='/usr/sw-mpp/bin/sw5ar'
 export RANLIB='/usr/sw-mpp/bin/sw5ranlib'

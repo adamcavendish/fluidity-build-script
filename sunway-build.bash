@@ -29,12 +29,9 @@ unset CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH INCLUDE
 unset LD_LIBRARY_PATH LIBRARY_PATH
 unset PKG_CONFIG_PATH
 
-# Add Sunway compiler tools PATH
-export PATH="/usr/sw-mpp/bin/:$PATH"
-
 # Build TCL and Modules for HOST machine
-source "$SCRIPT_DIR/sunway/build-tcl.host.bash"
-source "$SCRIPT_DIR/sunway/build-modules.host.bash"
+source "$SCRIPT_DIR/sunway/build-tcl-host.bash"
+source "$SCRIPT_DIR/sunway/build-modules-host.bash"
 
 # Hack the compilers
 source "$SCRIPT_DIR/sunway/compiler-hack.bash"
@@ -42,6 +39,13 @@ source "$SCRIPT_DIR/sunway/compiler-hack.bash"
 # Build TCL and Modules for Sunway
 source "$SCRIPT_DIR/sunway/build-tcl.bash"
 source "$SCRIPT_DIR/sunway/build-modules.bash"
+
+# Setup Modules Environment
+. "$INSTALL_DIR/modules-$MODULES-host/init/bash"
+module use "$MOD_GL_DIR"
+
+# Add Sunway compiler tools PATH
+export PATH="/usr/sw-mpp/bin/:$PATH"
 
 # Build PETSc
 source "$SCRIPT_DIR/sunway/build-petsc.bash"
