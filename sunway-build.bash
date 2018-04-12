@@ -33,19 +33,20 @@ unset PKG_CONFIG_PATH
 export PATH="/usr/sw-mpp/bin/:$PATH"
 
 # Build TCL and Modules for HOST machine
-. sunway/build-tcl.host.bash
-. sunway/build-modules.host.bash
+source "$SCRIPT_DIR/sunway/build-tcl.host.bash"
+source "$SCRIPT_DIR/sunway/build-modules.host.bash"
 
 # Hack the compilers
-. sunway/compiler-hack.bash
+source "$SCRIPT_DIR/sunway/compiler-hack.bash"
 
 # Build TCL and Modules for Sunway
-. sunway/build-tcl.bash
-. sunway/build-modules.bash
+source "$SCRIPT_DIR/sunway/build-tcl.bash"
+source "$SCRIPT_DIR/sunway/build-modules.bash"
 
-# Build PETSc and Zoltan
-. sunway/build-petsc-zoltan.bash
+# Build PETSc
+source "$SCRIPT_DIR/sunway/build-petsc.bash"
 
+exit 0
 
 # UDUnits
 BASE_DIR="$INSTALL_DIR/udunits-$UDUNITS/"

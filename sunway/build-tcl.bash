@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # TCL
-BASE_DIR="$INSTALL_DIR/tcl-$TCL"
+BASE_DIR="$INSTALL_DIR/tcl-$TCL/"
 if [ ! -d "$BASE_DIR" ]; then
   echo "------------------------------Build TCL-$TCL for Sunway------------------------------"
 

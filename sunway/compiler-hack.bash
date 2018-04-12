@@ -9,7 +9,7 @@ mkdir -p "$INSTALL_DIR/cc_hack/"
 for COMPILER in CC CXX FC; do
   for MODE in host slave hybrid; do
 
-cat > "$INSTALL_DIR/cc_hack/$COMPILER_$MODE" <<EOHD
+cat > "$INSTALL_DIR/cc_hack/$COMPILER"_"$MODE" <<EOHD
   ${!COMPILER} -$MODE "\$@"
 EOHD
 

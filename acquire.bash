@@ -64,6 +64,12 @@ __DIR="${_FILE%.tar.gz}"
 [ ! -f "$_FILE" ] && { wget -O "$_FILE" -c "https://support.hdfgroup.org/ftp/HDF5/current/src/hdf5-$HDF5.tar.gz"; }
 [ ! -d "$__DIR" ] && { mkdir "$__DIR" && tar xzf "$_FILE" -C "$__DIR" --strip-components=1; }
 
+# libxml2
+_FILE="libxml2-$XML2.tar.gz"
+__DIR="${_FILE%.tar.gz}"
+[ ! -f "$_FILE" ] && { wget -O "$_FILE" -c "https://github.com/GNOME/libxml2/archive/v$XML2.tar.gz"; }
+[ ! -d "$__DIR" ] && { mkdir "$__DIR" && tar xzf "$_FILE" -C "$__DIR" --strip-components=1; }
+
 # PETSc
 _FILE="petsc-$PETSC.tar.gz"
 __DIR="${_FILE%.tar.gz}"
