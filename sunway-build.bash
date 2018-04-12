@@ -3,8 +3,6 @@
 # SCRIPT_DIR: Current Script's Absolute Directory PATH
 # SOURCE_DIR: Source code PATH
 # INSTALL_DIR: Softwares are installed in this PATH
-# MOD_IN_DIR: The modulefile template files PATH
-# MOD_GL_DIR: The global modulefiles PATH installed for current user
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 mkdir -p "$SCRIPT_DIR/../source/"
@@ -14,8 +12,8 @@ mkdir -p "$SCRIPT_DIR/../log/"
 SOURCE_DIR="$( cd "$SCRIPT_DIR/../source/" && pwd )"
 INSTALL_DIR="$( cd "$SCRIPT_DIR/../install/" && pwd )"
 LOG_DIR="$(cd "$SCRIPT_DIR/../log/" && pwd )"
-MOD_IN_DIR="$( cd "$SCRIPT_DIR/modulefiles/" && pwd )"
-MOD_GL_DIR="$INSTALL_DIR/modulefiles/"
+MOD_IN_DIR="$( cd "$SCRIPT_DIR/moduleshell/" && pwd )"
+MOD_GL_DIR="$INSTALL_DIR/moduleshell/"
 
 PYTHON_VERSION="$(python --version 2>&1)"
 PYTHON_MAJOR_MINOR="$(echo "$PYTHON_VERSION" | awk '{ gsub(/\.[0-9]+$/,"",$2); print $2 }')"
@@ -34,116 +32,69 @@ unset PKG_CONFIG_PATH
 export CC='sw5cc -host'
 export CXX='sw5CC -host'
 export FC='sw5f90 -host'
+export AR='sw5ar'
+export RANLIB='sw5ranlib'
 
-# TCL
-BASE_DIR="$INSTALL_DIR/tcl-$TCL"
-if [ ! -d "$BASE_DIR" ]; then
-  echo "------------------------------Build TCL-$TCL------------------------------"
-
-  cd "$SOURCE_DIR/tcl-$TCL/unix/"
-  ./configure --prefix="$BASE_DIR"                                             2>&1 | tee "$LOG_DIR/tcl-$TCL.conf.log"
-  make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/tcl-$TCL.build.log"
-fi
-
-# Setup TCL environment
-TCL_MAJOR_MINOR=${TCL%.*}
-ln -sf "$BASE_DIR/bin/tclsh$TCL_MAJOR_MINOR" "$BASE_DIR/bin/tclsh" 2>&1
-
-export PATH="$BASE_DIR/bin/${PATH:+:$PATH}"
-export C_INCLUDE_PATH="$BASE_DIR/include/${C_INCLUDE_PATH:+:$C_INCLUDE_PATH}"
-export CPLUS_INCLUDE_PATH="$BASE_DIR/include/${CPLUS_INCLUDE_PATH:+:$CPLUS_INCLUDE_PATH}"
-export LD_LIBRARY_PATH="$BASE_DIR/lib/${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-export MANPATH="$BASE_DIR/man/${MANPATH:+:$MANPATH}"
-
-# Modules
-BASE_DIR="$INSTALL_DIR/modules-$MODULES/"
-if [ ! -d "$BASE_DIR" ]; then
-  echo "------------------------------Build Modules-$MODULES------------------------------"
-  cd "$SOURCE_DIR/modules-$MODULES"
-  ./configure --prefix="$BASE_DIR" --with-tcl="$INSTALL_DIR/tcl-$TCL/lib/"     2>&1 | tee "$LOG_DIR/modules-$MODULES.conf.log"
-  make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/modules-$MODULES.build.log"
-fi
-
-# Setup Modules Environment
-. "$INSTALL_DIR/modules-$MODULES/init/bash"
-module use "$MOD_GL_DIR"
-
-# Lzip
-BASE_DIR="$INSTALL_DIR/lzip-$LZIP"
-if [ ! -d "$BASE_DIR" ]; then
-  echo "------------------------------Build lzip-$LZIP------------------------------"
-  cd "$SOURCE_DIR/lzip-$LZIP"
-  ./configure --prefix="$BASE_DIR"                                             2>&1 | tee "$LOG_DIR/lzip-$LZIP.conf.log"
-  make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/lzip-$LZIP.build.log"
-fi
-cat "$MOD_IN_DIR/lzip.in" | mo > "$MOD_GL_DIR/lzip-$LZIP"
-
-# OpenMPI
-BASE_DIR="$INSTALL_DIR/openmpi-$OPENMPI/"
-if [ ! -d "$BASE_DIR" ]; then
-  echo "------------------------------Build openmpi-$OPENMPI------------------------------"
-  module load "gcc-$GCC"
-
-  cd "$SOURCE_DIR/openmpi-$OPENMPI/"
-  ./configure             \
-    --prefix="$BASE_DIR"  \
-    --enable-mpi-fortran  \
-    --enable-mpi-cxx      \
-    --enable-mpi-cxx-seek                                                      2>&1 | tee "$LOG_DIR/openmpi-$OPENMPI.conf.log"
-  make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/openmpi-$OPENMPI.build.log"
-
-  module unload "gcc-$GCC"
-fi
-cat "$MOD_IN_DIR/openmpi.in" | mo > "$MOD_GL_DIR/openmpi-$OPENMPI"
+# # Lzip
+# BASE_DIR="$INSTALL_DIR/lzip-$LZIP"
+# if [ ! -d "$BASE_DIR" ]; then
+#   echo "------------------------------Build lzip-$LZIP------------------------------"
+#   cd "$SOURCE_DIR/lzip-$LZIP"
+#   ./configure --prefix="$BASE_DIR"                                             2>&1 | tee "$LOG_DIR/lzip-$LZIP.conf.log"
+#   make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/lzip-$LZIP.build.log"
+# fi
+# cat "$MOD_IN_DIR/lzip.in" | mo > "$MOD_GL_DIR/lzip-$LZIP"
+# 
+# # OpenMPI
+# BASE_DIR="$INSTALL_DIR/openmpi-$OPENMPI/"
+# if [ ! -d "$BASE_DIR" ]; then
+#   echo "------------------------------Build openmpi-$OPENMPI------------------------------"
+# 
+#   cd "$SOURCE_DIR/openmpi-$OPENMPI/"
+#   ./configure             \
+#     --prefix="$BASE_DIR"  \
+#     --enable-mpi-fortran  \
+#     --enable-mpi-cxx      \
+#     --enable-mpi-cxx-seek                                                      2>&1 | tee "$LOG_DIR/openmpi-$OPENMPI.conf.log"
+#   make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/openmpi-$OPENMPI.build.log"
+# fi
+# cat "$MOD_IN_DIR/openmpi.in" | mo > "$MOD_GL_DIR/openmpi-$OPENMPI"
 
 # CMake
 BASE_DIR="$INSTALL_DIR/cmake-$CMAKE/"
 if [ ! -d "$BASE_DIR" ]; then
   echo "------------------------------Build CMake-$CMAKE------------------------------"
-  module load "gcc-$GCC"
 
   cd "$SOURCE_DIR/cmake-$CMAKE/"
   ./bootstrap --prefix="$BASE_DIR"                                             2>&1 | tee "$LOG_DIR/cmake-$CMAKE.conf.log"
   make -j$(nproc)                                                              2>&1 | tee "$LOG_DIR/cmake-$CMAKE.build.log"
   make install                                                                 2>&1 | tee "$LOG_DIR/cmake-$CMAKE.inst.log"
-
-  module unload "gcc-$GCC"
 fi
-cat "$MOD_IN_DIR/cmake.in" | mo > "$MOD_GL_DIR/cmake-$CMAKE"
+cat "$MOD_IN_DIR/cmake.bash.in" | mo > "$MOD_GL_DIR/cmake-$CMAKE.bash"
+source "$MOD_GL_DIR/cmake-$CMAKE.bash"
 
 # HDF5
 BASE_DIR="$INSTALL_DIR/hdf5-$HDF5/"
 if [ ! -d "$BASE_DIR" ]; then
   echo "------------------------------Build hdf5-$HDF5------------------------------"
-  module load "gcc-$GCC"
-  module load "openmpi-$OPENMPI"
-  module load "cmake-$CMAKE"
 
   cd "$SOURCE_DIR/hdf5-$HDF5/"
   CC=mpicc ./configure --prefix="$BASE_DIR" --enable-parallel                  2>&1 | tee "$LOG_DIR/hdf5-$HDF5.conf.log"
   make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/hdf5-$HDF5.build.log"
-
-  module unload "cmake-$CMAKE"
-  module unload "openmpi-$OPENMPI"
-  module unload "gcc-$GCC"
 fi
-cat "$MOD_IN_DIR/hdf5.in" | mo > "$MOD_GL_DIR/hdf5-$HDF5"
+cat "$MOD_IN_DIR/hdf5.bash.in" | mo > "$MOD_GL_DIR/hdf5-$HDF5.bash"
+source "$MOD_GL_DIR/hdf5-$HDF5.bash"
 
 # BLAS
 BASE_DIR="$INSTALL_DIR/blas-$BLAS/"
 if [ ! -d "$BASE_DIR" ]; then
   echo "------------------------------Build blas-$BLAS------------------------------"
-  module load "gcc-$GCC"
-  module load "cmake-$CMAKE"
 
   cd "$SOURCE_DIR/blas-$BLAS/"
   make -j$(nproc)                                                              2>&1 | tee "$LOG_DIR/blas-$BLAS.build.log"
 
   mkdir -p "$BASE_DIR/lib/"
   cp "$SOURCE_DIR/blas-$BLAS/blas_LINUX.a" "$BASE_DIR/lib/libblas.a"
-
-  module unload "cmake-$CMAKE"
-  module unload "gcc-$GCC"
 fi
 cat "$MOD_IN_DIR/blas.in" | mo > "$MOD_GL_DIR/blas-$BLAS"
 
@@ -151,9 +102,6 @@ cat "$MOD_IN_DIR/blas.in" | mo > "$MOD_GL_DIR/blas-$BLAS"
 BASE_DIR="$INSTALL_DIR/lapack-$LAPACK/"
 if [ ! -d "$BASE_DIR" ]; then
   echo "------------------------------Build lapack-$LAPACK------------------------------"
-  module load "gcc-$GCC"
-  module load "cmake-$CMAKE"
-  module load "blas-$BLAS"
 
   # LAPACK testing needs quite a lot of stack space
   ulimit -s unlimited
@@ -169,10 +117,6 @@ if [ ! -d "$BASE_DIR" ]; then
 
   mkdir -p "$BASE_DIR/lib/"
   cp "$SOURCE_DIR/lapack-$LAPACK/liblapack.a" "$BASE_DIR/lib/liblapack.a"
-
-  module unload "blas-$BLAS"
-  module unload "cmake-$CMAKE"
-  module unload "gcc-$GCC"
 fi
 cat "$MOD_IN_DIR/lapack.in" | mo > "$MOD_GL_DIR/lapack-$LAPACK"
 
@@ -180,11 +124,6 @@ cat "$MOD_IN_DIR/lapack.in" | mo > "$MOD_GL_DIR/lapack-$LAPACK"
 BASE_DIR="$INSTALL_DIR/petsc-$PETSC/"
 if [ ! -d "$BASE_DIR" ]; then
   echo "------------------------------Build petsc-$PETSC------------------------------"
-  module load "gcc-$GCC"
-  module load "openmpi-$OPENMPI"
-  module load "cmake-$CMAKE"
-  module load "blas-$BLAS"
-  module load "lapack-$LAPACK"
 
   # Check PETSc External Packages Dir
   if [ ! -d "$SOURCE_DIR/petsc-external-$PETSC/" ]; then
@@ -249,12 +188,6 @@ if [ ! -d "$BASE_DIR" ]; then
     --disable-examples                   \
     --enable-zoltan-cppdriver                                                  2>&1 | tee "$LOG_DIR/zoltan-$ZOLTAN.conf.log"
   make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/zoltan-$ZOLTAN.build.log"
-
-  module unload "lapack-$LAPACK"
-  module unload "blas-$BLAS"
-  module unload "cmake-$CMAKE"
-  module unload "openmpi-$OPENMPI"
-  module unload "gcc-$GCC"
 fi
 cat "$MOD_IN_DIR/petsc.in" | mo > "$MOD_GL_DIR/petsc-$PETSC"
 
@@ -263,16 +196,10 @@ BASE_DIR="$INSTALL_DIR/udunits-$UDUNITS/"
 if [ ! -d "$BASE_DIR" ]; then
   echo "------------------------------Build udunits-$UDUNITS------------------------------"
 
-  module load "gcc-$GCC"
-  module load "cmake-$CMAKE"
-
   cd "$SOURCE_DIR/udunits-$UDUNITS/"
 
   CPPFLAGS=-Df2cFortran ./configure --prefix="$BASE_DIR"                       2>&1 | tee "$LOG_DIR/udunits-$UDUNITS.conf.log"
   make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/udunits-$UDUNITS.build.log"
-
-  module unload "cmake-$CMAKE"
-  module unload "gcc-$GCC"
 fi
 cat "$MOD_IN_DIR/udunits.in" | mo > "$MOD_GL_DIR/udunits-$UDUNITS"
 
@@ -280,8 +207,6 @@ cat "$MOD_IN_DIR/udunits.in" | mo > "$MOD_GL_DIR/udunits-$UDUNITS"
 BASE_DIR="$INSTALL_DIR/vtk-$VTK/"
 if [ ! -d "$BASE_DIR" ]; then
   echo "------------------------------Build vtk-$VTK------------------------------"
-  module load "gcc-$GCC"
-  module load "cmake-$CMAKE"
 
   mkdir -p "$SOURCE_DIR/vtk-$VTK-build/"
   cd "$SOURCE_DIR/vtk-$VTK-build/"
@@ -295,9 +220,6 @@ if [ ! -d "$BASE_DIR" ]; then
     -DVTK_WRAP_PYTHON=ON                \
     "$SOURCE_DIR/vtk-$VTK/"                                                    2>&1 | tee "$LOG_DIR/vtk-$VTK.conf.log"
   make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/vtk-$VTK.build.log"
-
-  module unload "cmake-$CMAKE"
-  module unload "gcc-$GCC"
 fi
 cat "$MOD_IN_DIR/vtk.in" | mo > "$MOD_GL_DIR/vtk-$VTK"
 
@@ -305,8 +227,6 @@ cat "$MOD_IN_DIR/vtk.in" | mo > "$MOD_GL_DIR/vtk-$VTK"
 BASE_DIR="$INSTALL_DIR/gmsh-$GMSH/"
 if [ ! -d "$BASE_DIR" ]; then
   echo "------------------------------Build gmsh-$GMSH------------------------------"
-  module load "gcc-$GCC"
-  module load "cmake-$CMAKE"
 
   mkdir -p "$SOURCE_DIR/gmsh-$GMSH-build/"
   cd "$SOURCE_DIR/gmsh-$GMSH-build/"
@@ -315,9 +235,6 @@ if [ ! -d "$BASE_DIR" ]; then
     -DCMAKE_INSTALL_PREFIX="$BASE_DIR" \
     "$SOURCE_DIR/gmsh-$GMSH/"                                                  2>&1 | tee "$LOG_DIR/gmsh-$GMSH.conf.log"
   make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/gmsh-$GMSH.conf.log"
-
-  module unload "cmake-$CMAKE"
-  module unload "gcc-$GCC"
 fi
 cat "$MOD_IN_DIR/gmsh.in" | mo > "$MOD_GL_DIR/gmsh-$GMSH"
 
@@ -325,15 +242,6 @@ cat "$MOD_IN_DIR/gmsh.in" | mo > "$MOD_GL_DIR/gmsh-$GMSH"
 BASE_DIR="$INSTALL_DIR/fluidity-$FLUIDITY/"
 if [ ! -d "$BASE_DIR" ]; then
   echo "------------------------------Build fluidity-$FLUIDITY------------------------------"
-  module load "gcc-$GCC"
-  module load "openmpi-$OPENMPI"
-  module load "cmake-$CMAKE"
-  module load "blas-$BLAS"
-  module load "lapack-$LAPACK"
-  module load "udunits-$UDUNITS"
-  module load "petsc-$PETSC"
-  module load "gmsh-$GMSH"
-  module load "vtk-$VTK"
 
   cd "$SOURCE_DIR/fluidity-$FLUIDITY/"
 
@@ -344,16 +252,6 @@ if [ ! -d "$BASE_DIR" ]; then
     --with-blas="$INSTALL_DIR/blas-$BLAS/lib/libblas.a" \
     --with-lapack="$INSTALL_DIR/lapack-$LAPACK/lib/liblapack.a"                2>&1 | tee "$LOG_DIR/fluidity-$FLUIDITY.conf.log"
   make -j$(nproc) all                                                          2>&1 | tee "$LOG_DIR/fluidity-$FLUIDITY.build.log"
-
-  module unload "vtk-$VTK"
-  module unload "gmsh-$GMSH"
-  module unload "petsc-$PETSC"
-  module unload "udunits-$UDUNITS"
-  module unload "lapack-$LAPACK"
-  module unload "blas-$BLAS"
-  module unload "cmake-$CMAKE"
-  module unload "openmpi-$OPENMPI"
-  module unload "gcc-$GCC"
 fi
 cat "$MOD_IN_DIR/fluidity.in" | mo > "$MOD_GL_DIR/fluidity-$FLUIDITY"
 
@@ -361,15 +259,10 @@ cat "$MOD_IN_DIR/fluidity.in" | mo > "$MOD_GL_DIR/fluidity-$FLUIDITY"
 BASE_DIR="$INSTALL_DIR/spud-$SPUD/"
 if [ ! -d "$BASE_DIR" ]; then
   echo "------------------------------Build spud-$SPUD------------------------------"
-  module load "gcc-$GCC"
-  module load "cmake-$CMAKE"
 
   cd "$SOURCE_DIR/spud-$SPUD/"
 
   ./configure --prefix="$BASE_DIR"                                             2>&1 | tee "$LOG_DIR/spud-$SPUD.conf.log"
   make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/spud-$SPUD.build.log"
-
-  module unload "cmake-$CMAKE"
-  module unload "gcc-$GCC"
 fi
 cat "$MOD_IN_DIR/spud.in" | mo > "$MOD_GL_DIR/spud-$SPUD"
