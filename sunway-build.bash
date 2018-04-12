@@ -12,8 +12,8 @@ mkdir -p "$SCRIPT_DIR/../log/"
 SOURCE_DIR="$( cd "$SCRIPT_DIR/../source/" && pwd )"
 INSTALL_DIR="$( cd "$SCRIPT_DIR/../install/" && pwd )"
 LOG_DIR="$(cd "$SCRIPT_DIR/../log/" && pwd )"
-MOD_IN_DIR="$( cd "$SCRIPT_DIR/moduleshell/" && pwd )"
-MOD_GL_DIR="$INSTALL_DIR/moduleshell/"
+MOD_IN_DIR="$( cd "$SCRIPT_DIR/modulefiles/" && pwd )"
+MOD_GL_DIR="$INSTALL_DIR/modulefiles/"
 
 PYTHON_VERSION="$(python --version 2>&1)"
 PYTHON_MAJOR_MINOR="$(echo "$PYTHON_VERSION" | awk '{ gsub(/\.[0-9]+$/,"",$2); print $2 }')"
@@ -29,11 +29,69 @@ unset CPATH C_INCLUDE_PATH CPLUS_INCLUDE_PATH INCLUDE
 unset LD_LIBRARY_PATH LIBRARY_PATH
 unset PKG_CONFIG_PATH
 
-export CC='sw5cc -host'
-export CXX='sw5CC -host'
-export FC='sw5f90 -host'
-export AR='sw5ar'
-export RANLIB='sw5ranlib'
+# Hack the CC, CXX, FC
+CC='/usr/sw-mpp/bin/sw5cc'
+CXX='/usr/sw-mpp/bin/sw5CC'
+FC='/usr/sw-mpp/bin/sw5f90'
+
+mkdir -p "$INSTALL_DIR/cc_hack/"
+for COMPILER in (CC CXX FC); do
+  for MODE in (host slave hybrid); do
+
+cat > "$INSTALL_DIR/cc_hack/$COMPILER_$MODE" <<EOHD
+  ${!COMPILER} -$MODE "\$@"
+EOHD
+
+  done
+done
+
+export CC="$INSTALL_DIR/cc_hack/CC_HOST"
+export CXX="$INSTALL_DIR/cc_hack/CXX_HOST"
+export FC="$INSTALL_DIR/cc_hack/FC_HOST"
+export AR='/usr/sw-mpp/bin/sw5ar'
+export RANLIB='/usr/sw-mpp/bin/sw5ranlib'
+
+
+BASE_DIR="$INSTALL_DIR/tcl-$TCL"
+if [ ! -d "$BASE_DIR" ]; then
+  echo "------------------------------Build TCL-$TCL------------------------------"
+
+  cd "$SOURCE_DIR/tcl-$TCL/unix/"
+  ./configure                    \
+    --prefix="$BASE_DIR"         \
+    --target=sunway_64-linux-gnu \
+    --host=x86_64-linux-gnu                                                    2>&1 | tee "$LOG_DIR/tcl-$TCL.conf.log"
+  make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/tcl-$TCL.build.log"
+
+  read
+fi
+
+# Setup TCL environment
+TCL_MAJOR_MINOR=${TCL%.*}
+ln -sf "$BASE_DIR/bin/tclsh$TCL_MAJOR_MINOR" "$BASE_DIR/bin/tclsh" 2>&1
+
+export PATH="$BASE_DIR/bin/${PATH:+:$PATH}"
+export C_INCLUDE_PATH="$BASE_DIR/include/${C_INCLUDE_PATH:+:$C_INCLUDE_PATH}"
+export CPLUS_INCLUDE_PATH="$BASE_DIR/include/${CPLUS_INCLUDE_PATH:+:$CPLUS_INCLUDE_PATH}"
+export LD_LIBRARY_PATH="$BASE_DIR/lib/${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+export MANPATH="$BASE_DIR/man/${MANPATH:+:$MANPATH}"
+
+# Modules
+BASE_DIR="$INSTALL_DIR/modules-$MODULES/"
+if [ ! -d "$BASE_DIR" ]; then
+  echo "------------------------------Build Modules-$MODULES------------------------------"
+  cd "$SOURCE_DIR/modules-$MODULES"
+  ./configure --prefix="$BASE_DIR" --with-tcl="$INSTALL_DIR/tcl-$TCL/lib/"     2>&1 | tee "$LOG_DIR/modules-$MODULES.conf.log"
+  make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/modules-$MODULES.build.log"
+
+  read
+fi
+
+# Setup Modules Environment
+. "$INSTALL_DIR/modules-$MODULES/init/bash"
+module use "$MOD_GL_DIR"
+
+exit 0
 
 # # Lzip
 # BASE_DIR="$INSTALL_DIR/lzip-$LZIP"
