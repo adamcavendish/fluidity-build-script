@@ -1,5 +1,17 @@
 #!/bin/bash
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$SCRIPT_DIR/setup.bash"
+
+# Add Sunway compiler tools PATH
+export PATH="/usr/sw-mpp/bin/:$PATH"
+
+export CC='/usr/sw-mpp/bin/mpicc'
+export CXX='/usr/sw-mpp/bin/mpiCC'
+export FC='/usr/sw-mpp/bin/mpif90'
+export AR='/usr/sw-mpp/bin/sw5ar'
+export RANLIB='/usr/sw-mpp/bin/sw5ranlib'
+
 # TCL
 BASE_DIR="$INSTALL_DIR/tcl-$TCL/"
 if [ ! -d "$BASE_DIR" ]; then
@@ -15,7 +27,8 @@ if [ ! -d "$BASE_DIR" ]; then
     --prefix="$BASE_DIR"         \
     --target=sunway_64-linux-gnu \
     --host=alpha                                                               2>&1 | tee "$LOG_DIR/tcl-$TCL.conf.log"
-  make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/tcl-$TCL.build.log"
+  make                                                                         2>&1 | tee "$LOG_DIR/tcl-$TCL.build.log"
+  make install                                                                 2>&1 | tee "$LOG_DIR/tcl-$TCL.inst.log"
 
   unset __DIR
   unset _FILE

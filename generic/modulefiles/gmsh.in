@@ -1,0 +1,17 @@
+#%Module1.0#####################################################################
+##
+## GMSH modulefile
+##
+proc ModuleHelp { } {
+  global version
+  puts stderr "\tGMSH {{GMSH}}"
+}
+
+module-whatis "GMSH {{GMSH}}"
+
+set basedir {{BASE_DIR}}
+
+module load gcc-{{GCC}}
+
+prepend-path PATH               ${basedir}/bin/
+prepend-path MANPATH            ${basedir}/share/man/

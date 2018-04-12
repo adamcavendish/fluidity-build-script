@@ -1,5 +1,8 @@
 #!/bin/bash
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$SCRIPT_DIR/setup.bash"
+
 # TCL
 BASE_DIR="$INSTALL_DIR/tcl-$TCL-host/"
 if [ ! -d "$BASE_DIR" ]; then
@@ -13,7 +16,8 @@ if [ ! -d "$BASE_DIR" ]; then
   cd "$SOURCE_DIR/tcl-$TCL-host/unix/"
   ./configure             \
     --prefix="$BASE_DIR"                                                       2>&1 | tee "$LOG_DIR/tcl-$TCL-host.conf.log"
-  make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/tcl-$TCL-host.build.log"
+  make                                                                         2>&1 | tee "$LOG_DIR/tcl-$TCL-host.build.log"
+  make install                                                                 2>&1 | tee "$LOG_DIR/tcl-$TCL-host.inst.log"
 
   unset __DIR
   unset _FILE

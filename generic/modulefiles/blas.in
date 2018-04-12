@@ -1,0 +1,16 @@
+#%Module1.0#####################################################################
+##
+## BLAS modulefile
+##
+proc ModuleHelp { } {
+  global version
+  puts stderr "\tBLAS {{BLAS}}"
+}
+
+module-whatis "BLAS {{BLAS}}"
+
+set basedir {{BASE_DIR}}
+
+module load gcc-{{GCC}}
+
+prepend-path LD_LIBRARY_PATH ${basedir}/lib/

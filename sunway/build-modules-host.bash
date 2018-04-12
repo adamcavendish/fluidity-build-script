@@ -1,5 +1,8 @@
 #!/bin/bash
 
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+source "$SCRIPT_DIR/setup.bash"
+
 # Modules
 BASE_DIR="$INSTALL_DIR/modules-$MODULES-host/"
 if [ ! -d "$BASE_DIR" ]; then
