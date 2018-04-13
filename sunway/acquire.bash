@@ -49,6 +49,12 @@ __DIR="${_FILE%.tar.gz}"
 [ ! -f "$_FILE" ] && { wget -O "$_FILE" -c "http://download.savannah.gnu.org/releases/lzip/lzip-$LZIP.tar.gz"; }
 # [ ! -d "$__DIR" ] && { mkdir "$__DIR" && tar xzf "$_FILE" -C "$__DIR" --strip-components=1; }
 
+# LZMA
+_FILE="lzma-$LZMA.tar.gz"
+__DIR="${_FILE%.tar.gz}"
+[ ! -f "$_FILE" ] && { wget -O "$_FILE" -c "https://tukaani.org/xz/xz-$LZMA.tar.gz"; }
+# [ ! -d "$__DIR" ] && { mkdir "$__DIR" && tar xzf "$_FILE" -C "$__DIR" --strip-components=1; }
+
 # BLAS
 _FILE="blas-$BLAS.tar.gz"
 __DIR="${_FILE%.tar.gz}"
