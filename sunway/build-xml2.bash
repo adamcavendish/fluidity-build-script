@@ -28,6 +28,11 @@ if [ ! -d "$BASE_DIR" ]; then
     --target=sunway_64-linux-gnu            \
     --host=alpha                            \
     --enable-shared=no --enable-static=yes                                     2>&1 | tee "$LOG_DIR/libxml2-$XML2.conf.log"
+
+  # Fix sunway compiler doesn't have -Wno-array-bounds issue
+  mv Makefile Makefile.orig
+  cat Makefile.orig | sed 's/-Wno-array-bounds//g' > Makefile
+
   make -j$(nproc)                                                              2>&1 | tee "$LOG_DIR/libxml2-$XML2.build.log"
   make install                                                                 2>&1 | tee "$LOG_DIR/libxml2-$XML2.inst.log"
 
