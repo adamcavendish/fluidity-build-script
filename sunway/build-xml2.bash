@@ -23,7 +23,6 @@ if [ ! -d "$BASE_DIR" ]; then
   rm -rf "$__DIR" && mkdir -p "$__DIR" && tar xzf "$_FILE" -C "$__DIR" --strip-components=1
 
   cd "$SOURCE_DIR/libxml2-$XML2/"
-  NOCONFIGURE=1 bash ./autogen.sh
   ./configure                               \
     --prefix="$BASE_DIR"                    \
     --target=sunway_64-linux-gnu            \

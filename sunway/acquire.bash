@@ -77,7 +77,7 @@ __DIR="${_FILE%.tar.gz}"
 # libxml2
 _FILE="libxml2-$XML2.tar.gz"
 __DIR="${_FILE%.tar.gz}"
-[ ! -f "$_FILE" ] && { wget -O "$_FILE" -c "https://github.com/GNOME/libxml2/archive/v$XML2.tar.gz"; }
+[ ! -f "$_FILE" ] && { wget -O "$_FILE" -c "ftp://xmlsoft.org/libxml2/libxml2-$XML2.tar.gz"; }
 # [ ! -d "$__DIR" ] && { mkdir "$__DIR" && tar xzf "$_FILE" -C "$__DIR" --strip-components=1; }
 
 # PETSc
