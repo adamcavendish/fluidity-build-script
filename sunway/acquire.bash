@@ -10,6 +10,11 @@ source "$SCRIPT_DIR/VERSIONS"
 
 cd "$SOURCE_DIR"
 
+# Autoconf
+_FILE="autoconf-$AUTOCONF.tar.gz"
+__DIR="${_FILE%.tar.gz}"
+[ ! -f "$_FILE" ] && { wget -O "$_FILE" -c "https://ftp.gnu.org/gnu/autoconf/autoconf-$AUTOCONF.tar.gz"; }
+
 # ZLib
 _FILE="zlib-$ZLIB.tar.gz"
 __DIR="${_FILE%.tar.gz}"
