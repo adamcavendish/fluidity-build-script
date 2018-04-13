@@ -2,13 +2,18 @@
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-mkdir -p "$SCRIPT_DIR/../source/"
-SOURCE_DIR="$( cd "$SCRIPT_DIR/../source/" && pwd )"
+mkdir -p "$SCRIPT_DIR/../../source/"
+SOURCE_DIR="$( cd "$SCRIPT_DIR/../../source/" && pwd )"
 
 # Load Software Versions
 source "$SCRIPT_DIR/VERSIONS"
 
 cd "$SOURCE_DIR"
+
+# ZLib
+_FILE="zlib-$ZLIB.tar.gz"
+__DIR="${_FILE%.tar.gz}"
+[ ! -f "$_FILE" ] && { wget -O "$_FILE" -c "https://www.zlib.net/zlib-$ZLIB.tar.gz"; }
 
 # GSRC: GNU Source Release Collection
 __DIR="gsrc"

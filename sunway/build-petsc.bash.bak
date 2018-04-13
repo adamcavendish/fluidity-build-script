@@ -38,6 +38,7 @@ if [ ! -d "$BASE_DIR" ]; then
   unset _FILE
 
   # Get PETSc dependencies path
+  DEPS=( sowing )
   DEPS=( chaco ctetgen hypre metis ml mumps parmetis ptscotch scalapack sowing suitesparse triangle zoltan )
   for DEP in ${DEPS[@]}; do
     _VARNAME="$DEP"_SRC_PATH
@@ -67,6 +68,19 @@ if [ ! -d "$BASE_DIR" ]; then
     --with-debugging=0                                              \
     --with-fortran-interfaces=1                                     \
     --with-packages-dir="$SOURCE_DIR/petsc-external-$PETSC"         \
+    --download-chaco="$chaco_SRC_PATH"                              \
+    --download-ctetgen="$ctetgen_SRC_PATH"                          \
+    --download-hypre="$hypre_SRC_PATH"                              \
+    --download-metis="$metis_SRC_PATH"                              \
+    --download-ml="$ml_SRC_PATH"                                    \
+    --download-mumps="$mumps_SRC_PATH"                              \
+    --download-parmetis="$parmetis_SRC_PATH"                        \
+    --download-ptscotch="$ptscotch_SRC_PATH"                        \
+    --download-scalapack="$scalapack_SRC_PATH"                      \
+    --download-sowing="$sowing_SRC_PATH"                            \
+    --download-suitesparse="$suitesparse_SRC_PATH"                  \
+    --download-triangle="$triangle_SRC_PATH"                        \
+    --download-zoltan="$zoltan_SRC_PATH"                            \
     FFLAGS=-OPT:IEEE-arith=1                                        \
     CFLAGS=-OPT:IEEE-arith=1                                                   2>&1 | tee "$LOG_DIR/petsc-$PETSC.conf.log"
   bsub -I -q q_sw_expr -n 1 ./conftest-$PETSC_ARCH                             2>&1 | tee "$LOG_DIR/petsc-$PETSC.conftest.log"
