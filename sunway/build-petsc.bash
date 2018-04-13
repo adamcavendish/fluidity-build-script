@@ -67,6 +67,8 @@ if [ ! -d "$BASE_DIR" ]; then
     --with-debugging=0                                              \
     --with-fortran-interfaces=1                                     \
     --with-packages-dir="$SOURCE_DIR/petsc-external-$PETSC"         \
+    --download-sowing="$sowing_SRC_PATH"                            \
+    --download-chaco="$chaco_SRC_PATH"                              \
     FFLAGS=-OPT:IEEE-arith=1                                        \
     CFLAGS=-OPT:IEEE-arith=1                                                   2>&1 | tee "$LOG_DIR/petsc-$PETSC.conf.log"
   bsub -I -q q_sw_expr -n 1 ./conftest-$PETSC_ARCH                             2>&1 | tee "$LOG_DIR/petsc-$PETSC.conftest.log"

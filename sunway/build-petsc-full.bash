@@ -38,7 +38,6 @@ if [ ! -d "$BASE_DIR" ]; then
   unset _FILE
 
   # Get PETSc dependencies path
-  DEPS=( sowing )
   DEPS=( chaco ctetgen hypre metis ml mumps parmetis ptscotch scalapack sowing suitesparse triangle zoltan )
   for DEP in ${DEPS[@]}; do
     _VARNAME="$DEP"_SRC_PATH
