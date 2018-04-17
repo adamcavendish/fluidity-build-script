@@ -30,7 +30,7 @@ if [ ! -d "$BASE_DIR" ]; then
     "$SOURCE_DIR/vtk-$VTK/"                                                    2>&1 | tee "$LOG_DIR/vtk-$VTK.conf.log"
 
   # Fix sunway compiler doesn't have -Wextra issue
-  for _MAKEFILE in $(find . -iname 'flags.make' -o -iname 'lint.txt' -o -iname '*.settings'); do
+  for _MAKEFILE in $(find . -iname 'flags.make' -o -iname 'link.txt' -o -iname '*.settings'); do
     sed -i 's/-Wextra//g' "$_MAKEFILE"
   done
 
