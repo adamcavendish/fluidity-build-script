@@ -27,11 +27,16 @@ if [ ! -d "$BASE_DIR" ]; then
     --prefix="$BASE_DIR"                    \
     --target=sunway_64-linux-gnu            \
     --host=alpha                            \
-    --enable-shared=no --enable-static=yes                                     2>&1 | tee "$LOG_DIR/libxml2-$XML2.conf.log"
+    --with-python=no                        \
+    --with-lzma="$INSTALL_DIR/lzma-$LZMA/"  \
+    --enable-shared=no --enable-static=yes  \
+    LZMA_LIBS=-L"$INSTALL_DIR/lzma-$LZMA/lib -llzma -static"                   2>&1 | tee "$LOG_DIR/libxml2-$XML2.conf.log"
 
-  # Fix sunway compiler doesn't have -Wno-array-bounds issue
-  mv Makefile Makefile.orig
-  cat Makefile.orig | sed 's/-Wno-array-bounds//g' > Makefile
+  # Fix sunway compiler doesn't have -Wno-array-bounds, -Wextra issue
+  for _MAKEFILE in $(find . -iname 'Makefile'); do
+    sed -i 's/-Wno-array-bounds//g' "$_MAKEFILE"
+    sed -i 's/-Wextra//g'           "$_MAKEFILE"
+  done
 
   make -j$(nproc)                                                              2>&1 | tee "$LOG_DIR/libxml2-$XML2.build.log"
   make install                                                                 2>&1 | tee "$LOG_DIR/libxml2-$XML2.inst.log"

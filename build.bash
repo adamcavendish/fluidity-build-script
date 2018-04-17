@@ -316,31 +316,6 @@ if [ ! -d "$BASE_DIR" ]; then
 fi
 cat "$MOD_IN_DIR/udunits.in" | mo > "$MOD_GL_DIR/udunits-$UDUNITS"
 
-# VTK
-BASE_DIR="$INSTALL_DIR/vtk-$VTK/"
-if [ ! -d "$BASE_DIR" ]; then
-  echo "------------------------------Build vtk-$VTK------------------------------"
-  module load "gcc-$GCC"
-  module load "cmake-$CMAKE"
-
-  mkdir -p "$SOURCE_DIR/vtk-$VTK-build/"
-  cd "$SOURCE_DIR/vtk-$VTK-build/"
-
-  cmake                                 \
-    -DCMAKE_INSTALL_PREFIX="$BASE_DIR"  \
-    -DCMAKE_BUILD_TYPE=Release          \
-    -DBUILD_EXAMPLES=OFF                \
-    -DBUILD_SHARED_LIBS=ON              \
-    -DBUILD_TESTING=OFF                 \
-    -DVTK_WRAP_PYTHON=ON                \
-    "$SOURCE_DIR/vtk-$VTK/"                                                    2>&1 | tee "$LOG_DIR/vtk-$VTK.conf.log"
-  make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/vtk-$VTK.build.log"
-
-  module unload "cmake-$CMAKE"
-  module unload "gcc-$GCC"
-fi
-cat "$MOD_IN_DIR/vtk.in" | mo > "$MOD_GL_DIR/vtk-$VTK"
-
 # GMSH
 BASE_DIR="$INSTALL_DIR/gmsh-$GMSH/"
 if [ ! -d "$BASE_DIR" ]; then

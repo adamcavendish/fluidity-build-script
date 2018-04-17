@@ -29,8 +29,9 @@ if [ ! -d "$BASE_DIR" ]; then
     --host=alpha                                                               2>&1 | tee "$LOG_DIR/lzma-$LZMA.conf.log"
 
   # Fix sunway compiler doesn't have -Wextra issue
-  mv Makefile Makefile.orig
-  cat Makefile.orig | sed 's/-Wextra//g' > Makefile
+  for _MAKEFILE in $(find . -iname 'Makefile'); do
+    sed -i 's/-Wextra//g' "$_MAKEFILE"
+  done
 
   make -j$(nproc)                                                              2>&1 | tee "$LOG_DIR/lzma-$LZMA.build.log"
   make install                                                                 2>&1 | tee "$LOG_DIR/lzma-$LZMA.inst.log"
