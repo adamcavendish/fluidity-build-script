@@ -18,54 +18,16 @@ bash "$SCRIPT_DIR/sunway/build-modules.bash"
 # Build PETSc
 bash "$SCRIPT_DIR/sunway/build-petsc.bash"
 
+# Build UDUnits
+bash "$SCRIPT_DIR/sunway/build-udunits.bash"
+
+# Build VTK
+# bash "$SCRIPT_DIR/sunway/build-vtk.bash"
+
+# Build GMSH
+# bash "$SCRIPT_DIR/sunway/build-gmsh.bash"
+
 exit 0
-
-# UDUnits
-BASE_DIR="$INSTALL_DIR/udunits-$UDUNITS/"
-if [ ! -d "$BASE_DIR" ]; then
-  echo "------------------------------Build udunits-$UDUNITS------------------------------"
-
-  cd "$SOURCE_DIR/udunits-$UDUNITS/"
-
-  CPPFLAGS=-Df2cFortran ./configure --prefix="$BASE_DIR"                       2>&1 | tee "$LOG_DIR/udunits-$UDUNITS.conf.log"
-  make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/udunits-$UDUNITS.build.log"
-fi
-cat "$MOD_IN_DIR/udunits.in" | mo > "$MOD_GL_DIR/udunits-$UDUNITS"
-
-# VTK
-BASE_DIR="$INSTALL_DIR/vtk-$VTK/"
-if [ ! -d "$BASE_DIR" ]; then
-  echo "------------------------------Build vtk-$VTK------------------------------"
-
-  mkdir -p "$SOURCE_DIR/vtk-$VTK-build/"
-  cd "$SOURCE_DIR/vtk-$VTK-build/"
-
-  cmake                                 \
-    -DCMAKE_INSTALL_PREFIX="$BASE_DIR"  \
-    -DCMAKE_BUILD_TYPE=Release          \
-    -DBUILD_EXAMPLES=OFF                \
-    -DBUILD_SHARED_LIBS=ON              \
-    -DBUILD_TESTING=OFF                 \
-    -DVTK_WRAP_PYTHON=ON                \
-    "$SOURCE_DIR/vtk-$VTK/"                                                    2>&1 | tee "$LOG_DIR/vtk-$VTK.conf.log"
-  make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/vtk-$VTK.build.log"
-fi
-cat "$MOD_IN_DIR/vtk.in" | mo > "$MOD_GL_DIR/vtk-$VTK"
-
-# GMSH
-BASE_DIR="$INSTALL_DIR/gmsh-$GMSH/"
-if [ ! -d "$BASE_DIR" ]; then
-  echo "------------------------------Build gmsh-$GMSH------------------------------"
-
-  mkdir -p "$SOURCE_DIR/gmsh-$GMSH-build/"
-  cd "$SOURCE_DIR/gmsh-$GMSH-build/"
-
-  cmake                                \
-    -DCMAKE_INSTALL_PREFIX="$BASE_DIR" \
-    "$SOURCE_DIR/gmsh-$GMSH/"                                                  2>&1 | tee "$LOG_DIR/gmsh-$GMSH.conf.log"
-  make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/gmsh-$GMSH.conf.log"
-fi
-cat "$MOD_IN_DIR/gmsh.in" | mo > "$MOD_GL_DIR/gmsh-$GMSH"
 
 # Fluidity
 BASE_DIR="$INSTALL_DIR/fluidity-$FLUIDITY/"

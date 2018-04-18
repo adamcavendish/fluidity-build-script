@@ -26,8 +26,14 @@ if [ ! -d "$BASE_DIR" ]; then
   ./configure                    \
     --prefix="$BASE_DIR"         \
     --target=sunway_64-linux-gnu \
-    --host=alpha                                                               2>&1 | tee "$LOG_DIR/tcl-$TCL.conf.log"
-  make                                                                         2>&1 | tee "$LOG_DIR/tcl-$TCL.build.log"
+    --host=alpha                 \
+    --enable-shared=no                                                         2>&1 | tee "$LOG_DIR/tcl-$TCL.conf.log"
+  # Fix Sunway compiler issue: Cannot have trailing space with -D defined macros
+  sed -i -r 's/\s+$//g' Makefile
+  # Fix enabled-shared is forced by TCL
+  sed -i 's/--enable-shared --enable-threads/--enable-threads/g' Makefile
+
+  make -j$(nproc)                                                              2>&1 | tee "$LOG_DIR/tcl-$TCL.build.log"
   make install                                                                 2>&1 | tee "$LOG_DIR/tcl-$TCL.inst.log"
 
   unset __DIR
