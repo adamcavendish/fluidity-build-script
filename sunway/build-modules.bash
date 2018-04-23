@@ -27,6 +27,8 @@ if [ ! -d "$BASE_DIR" ]; then
     --prefix="$BASE_DIR"                           \
     --target=sunway_64-linux-gnu                   \
     --host=alpha                                   \
+    --enable-shell-funcs                           \
+    --enable-shell-alias                           \
     --with-tcl="$INSTALL_DIR/tcl-$TCL/lib/"                                    2>&1 | tee "$LOG_DIR/modules-$MODULES.conf.log"
   make -j$(nproc) install                                                      2>&1 | tee "$LOG_DIR/modules-$MODULES.build.log"
 

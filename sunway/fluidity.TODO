@@ -1,0 +1,153 @@
+# Step 1: Need to remove ADVANCE_IO checking part
+
+if test "$cross_compiling" = yes; then :
+  { { $as_echo "$as_me:${as_lineno-$LINENO}: error: in \`$ac_pwd':" >&5
+$as_echo "$as_me: error: in \`$ac_pwd':" >&2;}
+as_fn_error $? "cannot run test program while cross compiling
+See \`config.log' for more details" "$LINENO" 5; }
+else
+  cat > conftest.$ac_ext <<_ACEOF
+      program main
+
+        implicit none
+
+        integer :: unit = 10
+        integer :: i, data(3)
+
+        open(access='stream', action='write', form='formatted', file='conftest.data', unit=unit)
+        do i = 1, 3
+           write(fmt='(i0)', unit=unit) i
+        end do
+        close(unit=unit)
+
+        open(access='stream', action='read', form='formatted', file='conftest.data', unit=unit)
+        read(fmt='(i1)', advance='no', unit=unit)
+        read(fmt=*, unit=unit) data(1)
+        read(fmt=*, unit=unit) data(2)
+        read(fmt=*, unit=unit) data(3)
+        close(unit=unit)
+
+        if (all(data == (/1,2,3/))) then
+           call exit(0)
+        else
+           call exit(-1)
+        end if
+
+      end
+_ACEOF
+if ac_fn_fc_try_run "$LINENO"; then :
+    IO_ADVANCE_BUG="no"
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: fortran compiler has bugged advance io" >&5
+$as_echo "$as_me: fortran compiler has bugged advance io" >&6;}
+  $as_echo "#define IO_ADVANCE_BUG 1" >>confdefs.h
+
+  IO_ADVANCE_BUG="yes"
+
+fi
+rm -f core *.core core.conftest.* gmon.out bb.out conftest$ac_exeext \
+  conftest.$ac_objext conftest.beam conftest.$ac_ext
+fi
+
+# Step 2: Set IO_ADVANCE_BUG="yes"
+  { $as_echo "$as_me:${as_lineno-$LINENO}: fortran compiler has bugged advance io" >&5
+$as_echo "$as_me: fortran compiler has bugged advance io" >&6;}
+  $as_echo "#define IO_ADVANCE_BUG 1" >>confdefs.h
+
+  IO_ADVANCE_BUG="yes"
+
+# Step 3: delete libadaptivity configure script
+
+# Configure adaptivity
+if test -d libadaptivity ; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" >&5
+$as_echo "$as_me: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: Configuring libadaptivity" >&5
+$as_echo "$as_me: Configuring libadaptivity" >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" >&5
+$as_echo "$as_me: %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%" >&6;}
+
+    pushd libadaptivity
+    # We don't really want to use the same FFLAGS and LIBS as fluidity has
+    # worked out, because they contain all sorts of fluidity-specific junk,
+    # so we let libadapt's configure work out everything for itself
+    # * EXCEPT * for the compiler, which we MUST make sure is the same as
+    # fluidity's (except for MPI)
+    if test "$enable_dp" = "yes" ; then
+        FC="${saved_FC}" F77="${saved_F77}" F90="${saved_F90}" LIBS="${env_libs}" \
+            FFLAGS="${env_fflags} $PIC_FLAG $PROFILING_FLAG" FCFLAGS="${env_fcflags} $PIC_FLAG $PROFILING_FLAG" ./configure
+        if test "$?" -ne "0"; then
+          as_fn_error $? "Configuration of libadaptivity has failed." "$LINENO" 5
+          exit -1
+        fi
+    else
+        FC="${saved_FC}" F77="${saved_F77}" F90="${saved_F90}" LIBS="${env_libs}" \
+            FFLAGS="${env_fflags} $PIC_FLAG $PROFILING_FLAG" FCFLAGS="${env_fcflags} $PIC_FLAG $PROFILING_FLAG" ./configure --enable-dp=no
+        if test "$?" -ne "0"; then
+          as_fn_error $? "Configuration of libadaptivity has failed." "$LINENO" 5
+          exit -1
+        fi
+    fi
+    popd
+    BUILD_LIBADAPT="@echo '    MAKE libadaptivity'; \$(MAKE) -s -C libadaptivity && cp libadaptivity/lib/libadaptivity.a lib/"
+    CLEAN_LIBADAPT="@echo '    CLEAN libadaptivity'; \$(MAKE) -s -C libadaptivity clean"
+
+cat >> confdefs.h << EOF
+#define HAVE_ADAPTIVITY 1
+EOF
+else
+    as_fn_error $? "\"libadaptivity directory missing!!\"" "$LINENO" 5
+fi
+
+# Step 4: configure libadaptivity manually
+
+  # Configure libadaptivity
+  cd libadaptivity/
+  ./configure --host=alpha --enable-shared=no --enable-vtk=no --with-blas=-lxMath_manycore --with-lapack=-lxMath_manycore FORTRAN_REAL_8='-r8'
+
+# Step 5: Keep libadaptivity configuration for fluidity
+
+    BUILD_LIBADAPT="@echo '    MAKE libadaptivity'; \$(MAKE) -s -C libadaptivity && cp libadaptivity/lib/libadaptivity.a lib/"
+    CLEAN_LIBADAPT="@echo '    CLEAN libadaptivity'; \$(MAKE) -s -C libadaptivity clean"
+
+cat >> confdefs.h << EOF
+#define HAVE_ADAPTIVITY 1
+EOF
+
+# Step 6: Manually configure libjudy
+
+# Step 7: Delete libjudy configures
+
+...
+
+# Step 8: Remains some configs for libjudy
+
+cat >>confdefs.h <<_ACEOF
+#define SIZEOF_VOID_P 8
+_ACEOF
+
+JUDY_CFLAGS="-DJU_64BIT"
+
+LIBJUDY=-ljudy
+FLIBJUDY="./lib/libjudy.a"
+
+cat >> confdefs.h << EOF
+#define HAVE_JUDY 1
+EOF
+
+# Step 9: Delete libspud configure, remains ...
+
+SPUDLIB="${PWD}/lib/libspud.a"
+SPUDHEADER="${PWD}/include/spud.h"
+
+cat >> confdefs.h << EOF
+#define HAVE_SPUD 1
+EOF
+
+# Step 10: SpatialIndex ...
+
+LIBSPATIALINDEX="${PWD}/lib/libspatialindex.a"
+
+# Step 11: ARPACK
+
+
